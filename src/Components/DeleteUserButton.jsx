@@ -1,29 +1,35 @@
-import { Button, Group, Modal, Text } from "@mantine/core";
+import { Button, Group, Loader, Modal, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { MdDeleteOutline } from "react-icons/md";
 import { useMutation, useQueryClient } from "react-query";
 import { deleteUser } from "../queries/queries";
 import { useState } from "react";
+import { FaCheck } from "react-icons/fa";
 
 const DeleteUserButton = ({ item }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const QueryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate, isLoading, isSuccess } = useMutation({
     mutationFn: () => deleteUser(selectedItem.id),
-    onSettled: async () => {
-      await QueryClient.invalidateQueries(["users"]);
+    onSuccess: () => {
+      QueryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
+
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
     <div>
       {item.id !== 1 && item.id !== 2 && item.id !== 3 ? (
-        <Button onClick={() => (open(), setSelectedItem(item))} bg={"red"}>
+        <Button
+          size="xs"
+          onClick={() => (open(), setSelectedItem(item))}
+          bg={"red"}
+        >
           <MdDeleteOutline size={"18px"} />
         </Button>
       ) : (
-        <Button disabled>
+        <Button size="xs" disabled>
           <MdDeleteOutline size={"18px"} />
         </Button>
       )}
@@ -33,7 +39,13 @@ const DeleteUserButton = ({ item }) => {
         </Text>
         <Group display={"flex"} justify="center">
           <Button onClick={() => mutate()} bg={"red"}>
-            Delete
+            {isLoading ? (
+              <Loader color={"white"} size={"xs"} />
+            ) : isSuccess ? (
+              <FaCheck />
+            ) : (
+              "Delete"
+            )}
           </Button>
           <Button onClick={close}>Cancel</Button>
         </Group>

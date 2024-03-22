@@ -6,7 +6,7 @@ import "@mantine/core/styles.css";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { MantineProvider } from "@mantine/core";
 const queryClient = new QueryClient({});
-
+queryClient.invalidateQueries({ queryKey: ["users"] });
 ReactDOM.createRoot(document.getElementById("root")).render(
   <MantineProvider>
     <QueryClientProvider client={queryClient}>

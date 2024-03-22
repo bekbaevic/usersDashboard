@@ -12,6 +12,8 @@ function App() {
     queryKey: ["users"],
     queryFn: () => getData(),
     refetchOnWindowFocus: false,
+    retry: 1,
+    retryDelay: 1000,
   });
 
   if (isLoading) return <Loading />;
@@ -28,7 +30,15 @@ function App() {
         paddingBottom: "20px",
       }}
     >
-      <CreateUserButton />
+      <div
+        style={{
+          position: "sticky",
+          top: "10px",
+          left: "0",
+        }}
+      >
+        <CreateUserButton />
+      </div>
       <Text
         fw={700}
         size="24px"

@@ -3,12 +3,13 @@ import {
   Button,
   Drawer,
   Group,
+  Loader,
   PasswordInput,
   Text,
   TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import React from "react";
+import React, { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { createUser, updateUser } from "../queries/queries";
 
@@ -31,30 +32,25 @@ export const CreateComponent = ({ opened, onClose }) => {
     },
   });
 
-  const { mutate } = useMutation({
+  const { mutate, isLoading } = useMutation({
     mutationFn: () => createUser(form.values),
-    onSettled: async () => {
-      await QueryClient.invalidateQueries(["users"]);
+    onSuccess: async () => {
+      await QueryClient.invalidateQueries(["users"]),
+        onClose(),
+        form.setValues({
+          name: "",
+          email: "",
+          password: "",
+          avatar: "",
+        });
     },
   });
-
-  function createUserFunc() {
-    console.log(form.values);
-    mutate();
-    form.setValues({
-      name: "",
-      email: "",
-      password: "",
-      avatar: "",
-    });
-    onClose();
-  }
 
   return (
     <Drawer opened={opened} onClose={onClose}>
       <Box>
         <Box>
-          <form onSubmit={form.onSubmit(() => createUserFunc())}>
+          <form onSubmit={form.onSubmit(() => mutate())}>
             <Text fw={700} size="24px" mb={"20px"} ta={"center"}>
               Create new user
             </Text>
@@ -77,38 +73,18 @@ export const CreateComponent = ({ opened, onClose }) => {
               {...form.getInputProps("avatar")}
             />
             <Group mt={"10px"} display={"flex"} justify="end">
-              <Button type="submit">Create</Button>
+              <Button type="submit">
+                {isLoading ? (
+                  <Loader color="white" size="sm" type="dots" />
+                ) : (
+                  "Create"
+                )}
+              </Button>
               <Button bg={"red"} onClick={onClose}>
                 Cancel
               </Button>
             </Group>
           </form>
-        </Box>
-      </Box>
-    </Drawer>
-  );
-};
-
-export const UpdateComponent = ({ opened, onClose, selectedItem }) => {
-  const { mutate } = useMutation({
-    mutationFn: (newDate) => updateUser(selectedItem.id, newDate),
-  });
-  return (
-    <Drawer opened={opened} onClose={onClose}>
-      <Box>
-        <Box>
-          <Text fw={700} size="24px" mb={"20px"} ta={"center"}>
-            Update data
-          </Text>
-          <TextInput label="Name" />
-          <TextInput label="Email" />
-          <TextInput label="Avatar" />
-          <Group mt={"10px"} display={"flex"} justify="end">
-            <Button>Update</Button>
-            <Button bg={"red"} onClick={onClose}>
-              Cancel
-            </Button>
-          </Group>
         </Box>
       </Box>
     </Drawer>

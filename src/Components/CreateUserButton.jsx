@@ -13,11 +13,13 @@ const CreateUserButton = () => {
         onClick={open}
         leftSection={<IoIosAddCircle size={"18px"} />}
         mb={"20px"}
+        style={{
+          boxShadow: "2px 5px 10px rgba(0, 0, 0, 0.4)",
+        }}
       >
         Create user
       </Button>
       <CreateComponent opened={opened} onClose={close} />
-
     </div>
   );
 };
